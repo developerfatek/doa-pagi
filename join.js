@@ -23,7 +23,7 @@ const CONFIG = {
   durationMin: parseInt(process.env.DURATION_MIN || '35', 10),
   // Jadwal pengaman dalam WIB — di luar ini bot menolak jalan (kecuali FORCE=1),
   // supaya salah setting timezone cron tidak membuat bot join di waktu aneh.
-  days: ['Mon', 'Tue', 'Fri'],
+  days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
   windowStart: 7 * 60 + 45,
   windowEnd: 8 * 60 + 40,
 };

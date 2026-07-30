@@ -1,7 +1,7 @@
 # Deploy Bot Doa Pagi ke Render
 
 Bot join Zoom lewat Web Client (Chromium headless). **Server (app.js) terus
-hidup** dengan penjadwal internal: setiap **Senin, Selasa, Jum'at 07.58 WIB**
+hidup** dengan penjadwal internal: setiap **Senin s.d. Jum'at 07.58 WIB**
 otomatis menjalankan `join.js`, bertahan ±35 menit (kamera & mic mati), lalu
 keluar. **Tidak perlu cron** — jadwal ada di dalam aplikasi.
 

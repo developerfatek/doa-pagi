@@ -16,7 +16,7 @@ try {
 } catch {}
 
 const SCHEDULE = {
-  days: ['Mon', 'Tue', 'Fri'], // hari Doa Pagi
+  days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'], // hari Doa Pagi
   hour: 7,
   minute: 58, // jam mulai join, WIB
   lateMinutes: 17, // kalau app sempat mati, masih boleh mulai sampai 08:15
