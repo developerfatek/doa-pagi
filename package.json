@@ -1,0 +1,19 @@
+{
+  "name": "doa-pagi-bot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bot hadir Doa Pagi via Zoom Web Client (headless) untuk cPanel",
+  "main": "app.js",
+  "scripts": {
+    "check": "node check.js",
+    "join": "node join.js",
+    "test-join": "FORCE=1 DURATION_MIN=2 node join.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@sparticuz/chromium": "^133.0.0",
+    "puppeteer-core": "^24.0.0"
+  }
+}
