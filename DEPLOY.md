@@ -17,18 +17,24 @@ keluar. **Tidak perlu cron** — jadwal ada di dalam aplikasi.
 
 ## 2. Environment variables (menu Environment)
 
-- `APP_URL` = URL service Anda, mis. `https://doa-pagi.onrender.com`
-  (dipakai app untuk ping dirinya sendiri; isi setelah deploy pertama).
-- Saat mau uji coba saja: `DOA_TEST_AT` = jam WIB dekat (mis. `15:30`) dan
-  `DURATION_MIN` = `2`. Simpan → Render otomatis restart → bot join pada jam
-  itu. Setelah sukses, **hapus kedua variable ini** lagi.
+- Tidak ada yang wajib. Saat mau uji coba saja: `DOA_TEST_AT` = jam WIB dekat
+  (mis. `15:30`) dan `DURATION_MIN` = `2`. Simpan → Render otomatis restart →
+  bot join pada jam itu. Setelah sukses, **hapus kedua variable ini** lagi.
+- Opsional: `APP_URL` (override URL self-ping), `PING_MINUTES` (default 4),
+  `HEARTBEAT_MINUTES` (default 5).
 
-## 3. WAJIB: jangan biarkan service tidur (free tier)
+## 3. Anti-tidur: otomatis, tanpa cron/pinger eksternal
 
-Render free menidurkan service setelah ±15 menit tanpa traffic — kalau tidur,
-penjadwal ikut mati dan bot tidak akan join. Buat monitor gratis di
-**UptimeRobot** (atau cron-job.org): HTTP ping ke URL service tiap 5 menit.
-Kuota free 750 jam/bulan cukup untuk satu service hidup 24 jam nonstop.
+Render free menidurkan service setelah ±15 menit tanpa traffic masuk. App ini
+mengatasinya sendiri: tiap 4 menit dia nge-ping URL publiknya (otomatis dari
+`RENDER_EXTERNAL_URL` yang di-set Render) — ping itu terhitung traffic masuk,
+jadi service tidak pernah idle. Tiap 5 menit ada heartbeat di menu Logs
+sebagai bukti penjadwal hidup. Kuota free 750 jam/bulan cukup untuk satu
+service hidup 24 jam nonstop.
+
+Cadangan (opsional tapi disarankan): monitor gratis UptimeRobot ke URL service
+tiap 5 menit — bukan untuk anti-tidur, tapi sebagai alarm kalau service down
+betulan (self-ping tidak bisa membangunkan app yang sudah telanjur mati).
 
 ## 4. Ganti nama tampilan
 

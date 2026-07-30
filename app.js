@@ -117,12 +117,33 @@ setInterval(() => {
   if (shouldStart(w)) startJoin(w);
 }, 20000);
 
-// Lapisan kedua anti-tidur: ping diri sendiri kalau APP_URL di-set.
-// Tetap pasang pinger eksternal — app yang telanjur tidur tidak bisa
-// membangunkan dirinya sendiri.
-if (process.env.APP_URL && typeof fetch === 'function') {
-  setInterval(() => fetch(process.env.APP_URL).catch(() => {}), 4 * 60 * 1000);
+// Anti-tidur tanpa cron/pinger eksternal: ping URL publik sendiri tiap
+// beberapa menit. Ping ini lewat proxy Render sehingga terhitung traffic
+// masuk — free tier tidak menidurkan service selama ini berjalan.
+// Render otomatis mengisi RENDER_EXTERNAL_URL; APP_URL hanya untuk override.
+const SELF_URL = process.env.APP_URL || process.env.RENDER_EXTERNAL_URL || null;
+const PING_MIN = parseFloat(process.env.PING_MINUTES || '4');
+const HEARTBEAT_MIN = parseFloat(process.env.HEARTBEAT_MINUTES || '5');
+let lastPing = 'belum ada';
+if (SELF_URL && typeof fetch === 'function') {
+  setInterval(() => {
+    fetch(SELF_URL)
+      .then((r) => { lastPing = `${r.ok ? 'ok' : `HTTP ${r.status}`} ${wib().hhmm} WIB`; })
+      .catch((e) => { lastPing = `gagal (${e.message}) ${wib().hhmm} WIB`; });
+  }, PING_MIN * 60 * 1000);
 }
+
+// Heartbeat ke stdout (tampil di menu Logs Render) — bukti penjadwal hidup.
+// Sengaja tidak ditulis ke bot.log supaya halaman status tetap menampilkan
+// riwayat join, bukan tumpukan heartbeat.
+setInterval(() => {
+  const w = wib();
+  console.log(
+    `[${new Date().toISOString()}] [app] heartbeat — WIB ${w.day} ${w.hhmm}, ` +
+      `status: ${joinProc ? 'join berjalan' : lastStatus}, ` +
+      `self-ping: ${SELF_URL ? lastPing : 'NONAKTIF (RENDER_EXTERNAL_URL/APP_URL tidak ada)'}`
+  );
+}, HEARTBEAT_MIN * 60 * 1000);
 
 // Galeri screenshot bot: /shots (daftar) dan /shots/<nama>.png (gambar) —
 // berguna di Render karena tidak ada file manager.
@@ -171,6 +192,7 @@ http
         `Jadwal    : ${SCHEDULE.days.join(', ')} pukul ${jam} WIB`,
         `Mode uji  : ${TEST_AT ? `DOA_TEST_AT=${TEST_AT}` : 'tidak aktif'}`,
         `Status    : ${joinProc ? 'SEDANG join / di dalam meeting' : lastStatus}`,
+        `Anti-tidur: ${SELF_URL ? `self-ping tiap ${PING_MIN} menit → ${SELF_URL} (terakhir: ${lastPing})` : 'NONAKTIF — set APP_URL atau deploy di Render'}`,
         `Screenshot: buka /shots`,
         '',
         '=== Log terakhir ===',
