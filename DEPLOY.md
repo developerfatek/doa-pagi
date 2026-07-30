@@ -1,78 +1,52 @@
-# Deploy Bot Doa Pagi ke cPanel
+# Deploy Bot Doa Pagi ke Render
 
-Bot ini join Zoom lewat Web Client memakai Chromium headless, dijalankan Cron Job
-setiap **Senin, Selasa, Jum'at 07.58 WIB**, dan bertahan ±35 menit dengan kamera
-dan mic mati.
+Bot join Zoom lewat Web Client (Chromium headless). **Server (app.js) terus
+hidup** dengan penjadwal internal: setiap **Senin, Selasa, Jum'at 07.58 WIB**
+otomatis menjalankan `join.js`, bertahan ±35 menit (kamera & mic mati), lalu
+keluar. **Tidak perlu cron** — jadwal ada di dalam aplikasi.
 
-> Prasyarat: fitur **Setup Node.js App** (Node 18+), **Cron Jobs**, dan Terminal/SSH.
-> Langkah 3 (check.js) akan memberi tahu dalam 1 menit apakah hosting Anda sanggup.
+## 1. Setting saat membuat Web Service
 
-## 1. Upload
+- Source: repo `developerfatek/doa-pagi`, Branch: `master`
+- Language: `Node`
+- Region: bebas (Oregon oke — jadwal dihitung dalam WIB, bukan jam server)
+- Build Command: `npm install` (pakai `yarn` juga bisa)
+- Start Command: `npm start` (pakai `yarn start` juga bisa)
+- Instance Type: Free dulu. RAM free cuma 512 MB dan Chromium+Zoom lumayan
+  rakus — kalau log menunjukkan crash/out-of-memory saat join, naik ke Starter.
 
-Zip folder `cpanel-bot` **tanpa** `node_modules`, upload lewat File Manager,
-extract ke misalnya `/home/USERNAME/doa-pagi-bot`.
+## 2. Environment variables (menu Environment)
 
-## 2. Buat aplikasi Node.js
+- `APP_URL` = URL service Anda, mis. `https://doa-pagi.onrender.com`
+  (dipakai app untuk ping dirinya sendiri; isi setelah deploy pertama).
+- Saat mau uji coba saja: `DOA_TEST_AT` = jam WIB dekat (mis. `15:30`) dan
+  `DURATION_MIN` = `2`. Simpan → Render otomatis restart → bot join pada jam
+  itu. Setelah sukses, **hapus kedua variable ini** lagi.
 
-cPanel → **Setup Node.js App** → Create Application:
+## 3. WAJIB: jangan biarkan service tidur (free tier)
 
-- Node.js version: 18 atau lebih baru (pilih yang tertinggi)
-- Application root: `doa-pagi-bot`
-- Application URL: bebas (mis. `doa-pagi`)
-- Application startup file: `app.js`
-
-Klik **Create**, lalu klik **Run NPM Install** (agak lama, paket Chromium ±80 MB).
-Catat perintah `source /home/USERNAME/nodevenv/...` yang tampil di halaman itu —
-path `bin/node` di dalamnya dipakai untuk cron di langkah 6.
-
-## 3. Cek apakah hosting sanggup
-
-Buka Terminal cPanel:
-
-```bash
-source /home/USERNAME/nodevenv/doa-pagi-bot/20/bin/activate   # sesuaikan path
-cd ~/doa-pagi-bot
-node check.js
-```
-
-- `CHROMIUM OK` → lanjut. Output juga mencetak **baris cron yang benar** sesuai
-  timezone server (jangan pakai jam WIB mentah kalau server bukan WIB!).
-- `CHROMIUM GAGAL` → shared hosting Anda tidak mendukung browser headless.
-  Solusinya pindah VPS, atau pakai kembali otomasi Mac.
+Render free menidurkan service setelah ±15 menit tanpa traffic — kalau tidur,
+penjadwal ikut mati dan bot tidak akan join. Buat monitor gratis di
+**UptimeRobot** (atau cron-job.org): HTTP ping ke URL service tiap 5 menit.
+Kuota free 750 jam/bulan cukup untuk satu service hidup 24 jam nonstop.
 
 ## 4. Ganti nama tampilan
 
-Edit `join.js` → `displayName: 'Gopal'` → ganti sesuai nama Anda di absensi.
+Edit `join.js` → `displayName: 'Gopal'` → sesuaikan nama Anda di absensi,
+commit & push (Render auto-deploy dari branch master).
 
-## 5. Tes join sungguhan
+## 5. Memantau
 
-```bash
-FORCE=1 DURATION_MIN=2 node join.js
-```
-
-Lihat hasilnya di `bot.log` dan screenshot di folder `shots/` (download dan buka),
-atau buka Application URL dari langkah 2 untuk melihat log lewat browser.
-
-## 6. Pasang Cron Job
-
-cPanel → **Cron Jobs** → Add New Cron Job. Contoh untuk server ber-timezone UTC
-(pakai angka dari output `check.js`, dan sesuaikan `USERNAME` + versi node):
-
-```
-58 0 * * 1,2,5 /home/USERNAME/nodevenv/doa-pagi-bot/20/bin/node /home/USERNAME/doa-pagi-bot/join.js >> /home/USERNAME/doa-pagi-bot/cron.log 2>&1
-```
-
-`1,2,5` = Senin, Selasa, Jum'at. Ada pengaman tambahan di `join.js`: di luar
-jendela 07.45–08.40 WIB bot menolak jalan, jadi salah setting jam tidak akan
-membuat bot join tengah malam.
+- Buka URL service → halaman status: waktu WIB, jadwal, status join terakhir,
+  40 baris log terakhir.
+- Buka `/shots` → galeri screenshot yang diambil bot saat join (bukti hadir).
+- Menu **Logs** di dashboard Render menampilkan log lengkap secara live.
+- Disk Render bersifat sementara: `bot.log`, `shots/`, `locks/` terhapus tiap
+  deploy/restart — log permanen ada di dashboard Render.
 
 ## Catatan penting
 
-- **Jangan nyalakan dua otomasi sekaligus** (Mac + cPanel) — akan muncul dua
-  peserta dengan nama sama.
-- Proses harus hidup ±35 menit. Sebagian shared hosting membunuh proses
-  panjang/berat (limit LVE). Kalau bot sering putus di tengah, itu sebabnya.
-- Kalau undangan berganti link/passcode, update `pwd`, `passcode`, dan
-  `meetingId` di `join.js`.
-- Bot hadir "diam": kamera dan mic mati. Kalau moderator menyapa Anda, tidak ada
-  yang menjawab — pertimbangkan tetap ikut dari HP saat bisa.
+- Kalau undangan berganti link/passcode, update `pwd`, `passcode`, `meetingId`
+  di `join.js`; ubah jadwal (hari/jam) di `SCHEDULE` dalam `app.js`.
+- Bot hadir "diam": kamera dan mic mati. Kalau moderator menyapa Anda, tidak
+  ada yang menjawab — pertimbangkan tetap ikut dari HP saat bisa.
