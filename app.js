@@ -1,9 +1,9 @@
 // Aplikasi utama — server terus hidup (Render / VPS / cPanel Passenger):
 // menyajikan halaman status DAN menjalankan penjadwal internal yang men-spawn
-// join.js setiap Senin/Selasa/Jum'at pukul 07.58 WIB. Tidak perlu cron.
+// join.js setiap Senin s.d. Jum'at pukul 07.58 WIB. Tidak perlu cron.
 //
 // Catatan Render (free tier): instance tidur setelah ±15 menit tanpa traffic —
-// wajib pasang ping eksternal (mis. UptimeRobot) ke URL app. Lihat DEPLOY.md.
+// diatasi dengan self-ping ke RENDER_EXTERNAL_URL (lihat blok anti-tidur).
 const http = require("http");
 const fs = require("fs");
 const path = require("path");

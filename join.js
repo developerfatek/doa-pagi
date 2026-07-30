@@ -130,6 +130,14 @@ async function setMediaOff(page) {
   });
 
   try {
+    // Izinkan mic/kamera di level browser. Di headless Linux prompt "Allow"
+    // tidak pernah terjawab (tidak ada yang bisa klik), jadi tanpa ini bot
+    // tertahan di overlay "Select Allow to let Zoom use your microphone".
+    const ctx = browser.defaultBrowserContext();
+    for (const origin of [`https://${CONFIG.domain}`, 'https://zoom.us', 'https://app.zoom.us']) {
+      await ctx.overridePermissions(origin, ['microphone', 'camera']).catch(() => {});
+    }
+
     const page = await browser.newPage();
     // UA headless bawaan sering ditolak; samarkan sebagai Chrome biasa.
     await page.setUserAgent(
