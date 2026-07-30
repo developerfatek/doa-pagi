@@ -15,13 +15,21 @@ keluar. **Tidak perlu cron** — jadwal ada di dalam aplikasi.
 - Instance Type: Free dulu. RAM free cuma 512 MB dan Chromium+Zoom lumayan
   rakus — kalau log menunjukkan crash/out-of-memory saat join, naik ke Starter.
 
-## 2. Environment variables (menu Environment)
+## 2. Konfigurasi (.env / Environment)
 
-- Tidak ada yang wajib. Saat mau uji coba saja: `DOA_TEST_AT` = jam WIB dekat
-  (mis. `15:30`) dan `DURATION_MIN` = `2`. Simpan → Render otomatis restart →
-  bot join pada jam itu. Setelah sukses, **hapus kedua variable ini** lagi.
-- Opsional: `APP_URL` (override URL self-ping), `PING_MINUTES` (default 4),
-  `HEARTBEAT_MINUTES` (default 5).
+Semua konfigurasi (meeting ID, passcode, nama tampilan, durasi, dll.) ada di
+file `.env` — salin dari `.env.example` lalu sesuaikan. File `.env` sengaja
+tidak ikut ke git, jadi di Render pilih salah satu:
+
+- **Secret File** (paling praktis): menu Environment → Secret Files → buat
+  file bernama `.env`, tempel isi `.env` Anda; atau
+- isi variable satu per satu di menu **Environment**.
+
+Variable dari dashboard Render selalu menang atas isi `.env`.
+
+Saat mau uji coba saja: set `DOA_TEST_AT` = jam WIB dekat (mis. `15:30`) dan
+`DURATION_MIN` = `2`. Simpan → Render otomatis restart → bot join pada jam
+itu. Setelah sukses, **hapus kedua variable ini** lagi.
 
 ## 3. Anti-tidur: otomatis, tanpa cron/pinger eksternal
 
@@ -38,8 +46,8 @@ betulan (self-ping tidak bisa membangunkan app yang sudah telanjur mati).
 
 ## 4. Ganti nama tampilan
 
-Edit `join.js` → `displayName: 'Gopal'` → sesuaikan nama Anda di absensi,
-commit & push (Render auto-deploy dari branch master).
+Ubah `DISPLAY_NAME` di `.env` (atau di Environment/Secret File Render)
+sesuai nama Anda di absensi — tidak perlu edit kode.
 
 ## 5. Memantau
 

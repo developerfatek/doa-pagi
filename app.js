@@ -9,6 +9,12 @@ const fs = require('fs');
 const path = require('path');
 const { spawn } = require('child_process');
 
+// Muat konfigurasi dari .env (tanpa paket dotenv — bawaan Node 20.12+).
+// Variable yang sudah ada di environment (mis. dashboard Render) menang.
+try {
+  if (typeof process.loadEnvFile === 'function') process.loadEnvFile(path.join(__dirname, '.env'));
+} catch {}
+
 const SCHEDULE = {
   days: ['Mon', 'Tue', 'Fri'], // hari Doa Pagi
   hour: 7,

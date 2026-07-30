@@ -5,6 +5,12 @@ const path = require('path');
 const chromium = require('@sparticuz/chromium');
 const puppeteer = require('puppeteer-core');
 
+// Muat konfigurasi dari .env (tanpa paket dotenv — bawaan Node 20.12+).
+// Variable yang sudah ada di environment (mis. dari app.js/Render) menang.
+try {
+  if (typeof process.loadEnvFile === 'function') process.loadEnvFile(path.join(__dirname, '.env'));
+} catch {}
+
 const CONFIG = {
   meetingId: process.env.ZOOM_MEETING_ID || '84694518277',
   // pwd terenkripsi yang menempel di link undangan — bukan passcode mentah.
