@@ -54,7 +54,14 @@ async function shot(page, name) {
   try {
     fs.mkdirSync(SHOTS_DIR, { recursive: true });
     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    await page.screenshot({ path: path.join(SHOTS_DIR, `${stamp}-${name}.png`) });
+    // JPEG kualitas rendah + optimizeForSpeed: di instance kecil (0.1 vCPU)
+    // capture PNG sering melewati protocolTimeout saat Zoom me-render video.
+    await page.screenshot({
+      path: path.join(SHOTS_DIR, `${stamp}-${name}.jpg`),
+      type: 'jpeg',
+      quality: 40,
+      optimizeForSpeed: true,
+    });
     const old = fs.readdirSync(SHOTS_DIR).sort().slice(0, -20);
     for (const f of old) fs.unlinkSync(path.join(SHOTS_DIR, f));
   } catch (e) {
@@ -120,7 +127,11 @@ async function setMediaOff(page) {
   const browser = await puppeteer.launch({
     executablePath: await executablePath(),
     headless: true,
-    defaultViewport: { width: 1280, height: 720 },
+    // Chrome bisa butuh >3 menit merespons CDP saat CPU tercekik oleh render
+    // video Zoom; default 180 detik membuat semua screenshot timeout.
+    protocolTimeout: 480000,
+    // Viewport kecil = beban render/composite jauh lebih ringan.
+    defaultViewport: { width: 640, height: 360 },
     args: [
       ...(process.platform === 'linux' ? chromium.args : []),
       '--use-fake-ui-for-media-stream',

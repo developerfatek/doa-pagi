@@ -182,7 +182,7 @@ setInterval(
   HEARTBEAT_MIN * 60 * 1000,
 );
 
-// Galeri screenshot bot: /shots (daftar) dan /shots/<nama>.png (gambar) —
+// Galeri screenshot bot: /shots (daftar) dan /shots/<nama>.png|.jpg (gambar) —
 // berguna di Render karena tidak ada file manager.
 function serveShots(req, res) {
   const name = decodeURIComponent(
@@ -201,14 +201,16 @@ function serveShots(req, res) {
     );
     return;
   }
-  if (!/^[\w.-]+\.png$/.test(name)) {
+  if (!/^[\w.-]+\.(png|jpe?g)$/.test(name)) {
     res.writeHead(400);
     res.end("nama file tidak valid");
     return;
   }
   try {
     const buf = fs.readFileSync(path.join(SHOTS_DIR, name));
-    res.writeHead(200, { "Content-Type": "image/png" });
+    res.writeHead(200, {
+      "Content-Type": name.endsWith(".png") ? "image/png" : "image/jpeg",
+    });
     res.end(buf);
   } catch {
     res.writeHead(404);
