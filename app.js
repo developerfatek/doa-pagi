@@ -249,7 +249,7 @@ http
       ].join("\n"),
     );
   })
-  .listen(process.env.PORT || 3000);
+  .listen(process.env.PORT || 3001);
 
 log(
   `app.js start — penjadwal aktif (${SCHEDULE.days.join(",")} 07:58 WIB${TEST_AT ? `, mode uji ${TEST_AT}` : ""}).`,
