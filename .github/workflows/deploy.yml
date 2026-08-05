@@ -1,0 +1,87 @@
+name: Auto Pull ke VPS
+
+# Setiap push ke master, VPS diminta menarik perubahan terbaru (git pull),
+# lalu memasang dependensi dan me-restart bot lewat pm2. Tidak ada build atau
+# upload berkas — kode sudah ada di VPS, cukup disinkronkan dari GitHub.
+on:
+  push:
+    branches: [master]
+  # Bisa juga dipicu manual dari tab Actions bila diperlukan.
+  workflow_dispatch:
+
+# Jangan sampai dua deploy jalan bersamaan di VPS yang sama.
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: true
+
+env:
+  # Lokasi folder repo di VPS.
+  APP_DIR: /home/gopal/apps/doa-pagi
+  # Nama proses di pm2.
+  PM2_NAME: doa-pagi
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Siapkan kunci SSH
+        env:
+          SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          SSH_HOST: ${{ secrets.VPS_SSH_HOST }}
+          SSH_PORT: ${{ secrets.VPS_SSH_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          # printf pada secret kosong tetap menulis satu byte newline, jadi
+          # berkasnya lolos uji "tidak kosong". Pastikan isinya kunci sungguhan.
+          if ! grep -q 'PRIVATE KEY' ~/.ssh/deploy_key; then
+            echo "✗ Secret VPS_SSH_KEY kosong atau bukan kunci privat yang sah."
+            echo "  Isinya harus kunci utuh, termasuk baris BEGIN/END."
+            exit 1
+          fi
+
+          # ssh-keyscan kadang gagal sesaat; dicoba ulang dan stderr disimpan.
+          for attempt in 1 2 3; do
+            if ssh-keyscan -T 20 -p "$SSH_PORT" "$SSH_HOST" > ~/.ssh/known_hosts 2>/tmp/keyscan.log \
+               && [ -s ~/.ssh/known_hosts ]; then
+              echo "✓ host key didapat (percobaan $attempt)"
+              break
+            fi
+            echo "  percobaan $attempt gagal, mengulang dalam 5 detik…"
+            sleep 5
+            if [ "$attempt" = 3 ]; then
+              echo "✗ Tidak bisa mengambil host key dari $SSH_HOST port $SSH_PORT."
+              cat /tmp/keyscan.log || true
+              exit 1
+            fi
+          done
+
+      - name: Pull, install & restart di VPS
+        run: |
+          ssh -p "${{ secrets.VPS_SSH_PORT }}" -i ~/.ssh/deploy_key \
+            "${{ secrets.VPS_SSH_USER }}@${{ secrets.VPS_SSH_HOST }}" \
+            "APP_DIR='${APP_DIR}' PM2_NAME='${PM2_NAME}' bash -s" <<'REMOTE'
+          set -euo pipefail
+
+          cd "$APP_DIR"
+
+          echo "▸ menarik perubahan terbaru…"
+          git fetch --all --prune
+          git reset --hard origin/master
+
+          echo "▸ memasang dependensi…"
+          npm install --omit=dev
+
+          echo "▸ me-restart bot lewat pm2…"
+          # Kalau proses belum ada, start; kalau sudah ada, restart.
+          if pm2 describe "$PM2_NAME" > /dev/null 2>&1; then
+            pm2 restart "$PM2_NAME" --update-env
+          else
+            pm2 start app.js --name "$PM2_NAME"
+          fi
+          pm2 save
+
+          echo "✓ selesai."
+          REMOTE
