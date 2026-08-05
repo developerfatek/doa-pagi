@@ -59,9 +59,25 @@ jobs:
           done
 
       - name: Pull, install & restart di VPS
+        env:
+          SSH_HOST: ${{ secrets.VPS_SSH_HOST }}
+          SSH_PORT: ${{ secrets.VPS_SSH_PORT }}
+          SSH_USER: ${{ secrets.VPS_SSH_USER }}
         run: |
-          ssh -p "${{ secrets.VPS_SSH_PORT }}" -i ~/.ssh/vps_deploy \
-            "${{ secrets.VPS_SSH_USER }}@${{ secrets.VPS_SSH_HOST }}" \
+          # Pastikan tiga secret koneksi terisi. Kalau ada yang kosong, ssh
+          # akan menerima argumen tak sah dan hanya mencetak "usage: ssh"
+          # (exit 255) tanpa keterangan — jadi dicegat lebih dulu di sini.
+          for name in SSH_HOST SSH_PORT SSH_USER; do
+            if [ -z "${!name}" ]; then
+              echo "✗ Secret VPS_${name} kosong. Isi di Settings → Secrets → Actions."
+              exit 1
+            fi
+          done
+
+          ssh -p "$SSH_PORT" -i ~/.ssh/vps_deploy \
+            -o BatchMode=yes \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            "${SSH_USER}@${SSH_HOST}" \
             "APP_DIR='${APP_DIR}' PM2_NAME='${PM2_NAME}' bash -s" <<'REMOTE'
           set -euo pipefail
 
