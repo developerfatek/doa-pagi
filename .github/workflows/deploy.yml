@@ -31,12 +31,12 @@ jobs:
           SSH_PORT: ${{ secrets.VPS_SSH_PORT }}
         run: |
           mkdir -p ~/.ssh
-          printf '%s\n' "$SSH_KEY" > ~/.ssh/vps_key
-          chmod 600 ~/.ssh/vps_key
+          printf '%s\n' "$SSH_KEY" > ~/.ssh/vps_deploy
+          chmod 600 ~/.ssh/vps_deploy
 
           # printf pada secret kosong tetap menulis satu byte newline, jadi
           # berkasnya lolos uji "tidak kosong". Pastikan isinya kunci sungguhan.
-          if ! grep -q 'PRIVATE KEY' ~/.ssh/vps_key; then
+          if ! grep -q 'PRIVATE KEY' ~/.ssh/vps_deploy; then
             echo "✗ Secret VPS_SSH_KEY kosong atau bukan kunci privat yang sah."
             echo "  Isinya harus kunci utuh, termasuk baris BEGIN/END."
             exit 1
@@ -60,7 +60,7 @@ jobs:
 
       - name: Pull, install & restart di VPS
         run: |
-          ssh -p "${{ secrets.VPS_SSH_PORT }}" -i ~/.ssh/vps_key \
+          ssh -p "${{ secrets.VPS_SSH_PORT }}" -i ~/.ssh/vps_deploy \
             "${{ secrets.VPS_SSH_USER }}@${{ secrets.VPS_SSH_HOST }}" \
             "APP_DIR='${APP_DIR}' PM2_NAME='${PM2_NAME}' bash -s" <<'REMOTE'
           set -euo pipefail
