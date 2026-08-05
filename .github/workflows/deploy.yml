@@ -90,6 +90,11 @@ jobs:
           echo "▸ memasang dependensi…"
           npm install --omit=dev
 
+          # Shell SSH non-interaktif tidak memuat profil, jadi folder bin
+          # global npm (tempat pm2 terpasang) belum ada di PATH. npm sendiri
+          # sudah ketemu, jadi prefix-nya dipakai untuk menemukan pm2.
+          export PATH="$(npm config get prefix)/bin:$PATH"
+
           echo "▸ me-restart bot lewat pm2…"
           # Kalau proses belum ada, start; kalau sudah ada, restart.
           if pm2 describe "$PM2_NAME" > /dev/null 2>&1; then
