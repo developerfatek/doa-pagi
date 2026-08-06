@@ -1,6 +1,6 @@
 node_modules
-bot.log
-cron.log
-shots/
-locks/
-.env
+# bot.log
+# cron.log
+# shots/
+# locks/
+# .env

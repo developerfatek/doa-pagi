@@ -1,0 +1,37 @@
+[2026-07-30T07:09:17.821Z] Mulai: join meeting 84694518277 sebagai "Gopal" selama ~1 menit.
+[2026-07-30T07:09:33.615Z] Klik tombol join: preview-join-button
+[2026-07-30T07:09:34.379Z] BERHASIL masuk meeting.
+[2026-07-30T07:10:34.413Z] Durasi selesai — keluar dari meeting.
+[2026-07-30T07:10:34.717Z] Selesai.
+[2026-07-30T07:11:57.415Z] Mulai: join meeting 84694518277 sebagai "Gopal" selama ~1 menit.
+[2026-07-30T07:12:11.275Z] Media dimatikan: mic-mute, kamera-off
+[2026-07-30T07:12:11.321Z] Klik tombol join: preview-join-button
+[2026-07-30T07:12:11.988Z] BERHASIL masuk meeting.
+[2026-07-30T07:13:12.040Z] Durasi selesai — keluar dari meeting.
+[2026-07-30T07:13:12.173Z] Selesai.
+[2026-07-30T07:22:41.341Z] Di luar jadwal (WIB sekarang: Thu 14:22) — keluar. Pakai FORCE=1 untuk tes.
+[2026-07-30T07:23:41.383Z] Di luar jadwal (WIB sekarang: Thu 14:23) — keluar. Pakai FORCE=1 untuk tes.
+[2026-07-30T07:23:51.729Z] Mulai: join meeting 84694518277 sebagai "Gopal" selama ~2 menit.
+[2026-07-30T07:24:05.642Z] Media dimatikan: mic-mute, kamera-off
+[2026-07-30T07:24:05.682Z] Klik tombol join: preview-join-button
+[2026-07-30T07:24:06.385Z] BERHASIL masuk meeting.
+[2026-07-30T07:26:06.446Z] Durasi selesai — keluar dari meeting.
+[2026-07-30T07:26:06.593Z] Selesai.
+[2026-07-30T07:38:02.635Z] [app] app.js start — penjadwal aktif (Mon,Tue,Fri 07:58 WIB, mode uji 14:40).
+[2026-07-30T07:40:02.646Z] [app] Jadwal tiba (Thu 14:40 WIB) — menjalankan join.js
+[2026-07-30T07:40:02.793Z] Mulai: join meeting 84694518277 sebagai "Gopal" selama ~1 menit.
+[2026-07-30T07:40:16.676Z] Media dimatikan: mic-mute, kamera-off
+[2026-07-30T07:40:16.714Z] Klik tombol join: preview-join-button
+[2026-07-30T07:40:17.660Z] BERHASIL masuk meeting.
+[2026-07-30T07:41:17.705Z] Durasi selesai — keluar dari meeting.
+[2026-07-30T07:41:17.855Z] Selesai.
+[2026-07-30T07:41:18.018Z] [app] join.js selesai (exit 0).
+[2026-07-30T07:42:37.302Z] Di luar jadwal (WIB sekarang: Thu 14:42) — keluar. Pakai FORCE=1 untuk tes.
+[2026-07-30T07:49:23.951Z] [app] app.js start — penjadwal aktif (Mon,Tue,Fri 07:58 WIB).
+[2026-07-30T07:55:16.229Z] [app] app.js start — penjadwal aktif (Mon,Tue,Fri 07:58 WIB).
+[2026-07-30T08:51:34.507Z] Mulai: join meeting 84694518277 sebagai "Gopal" selama ~1 menit.
+[2026-07-30T08:51:48.461Z] Media dimatikan: mic-mute, kamera-off
+[2026-07-30T08:51:48.519Z] Klik tombol join: preview-join-button
+[2026-07-30T08:51:50.442Z] BERHASIL masuk meeting.
+[2026-07-30T08:52:50.491Z] Durasi selesai — keluar dari meeting.
+[2026-07-30T08:52:50.629Z] Selesai.
